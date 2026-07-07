@@ -27,7 +27,7 @@ export async function Sidebar() {
     <aside className="flex w-[240px] shrink-0 flex-col gap-6 border-r border-border bg-sidebar px-4 py-8">
       <Link href="/" className="px-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="파우치" className="h-8 w-auto" />
+        <img src="/logo.png" alt="POUCH" className="h-8 w-auto" />
       </Link>
 
       {hasLoadError && (
