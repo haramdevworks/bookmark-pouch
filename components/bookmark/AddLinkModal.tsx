@@ -56,7 +56,7 @@ export function AddLinkModal({ variant = "fab" }: { variant?: "fab" | "cta" }) {
       <DialogTrigger
         className={
           variant === "fab"
-            ? "fixed right-8 bottom-8 flex h-9 items-center gap-1.5 rounded-lg bg-primary px-4 text-[13px] font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+            ? "fixed right-4 bottom-4 flex h-9 items-center gap-1.5 rounded-lg bg-primary px-4 text-[13px] font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg md:right-8 md:bottom-8"
             : "inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-4 text-[13px] font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
         }
       >

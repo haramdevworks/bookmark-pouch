@@ -39,9 +39,9 @@ export function BookmarkCard({
       onKeyDown={(event) => {
         if (event.key === "Enter") goToDetail();
       }}
-      className="group flex cursor-pointer gap-5 rounded-xl border border-border bg-card p-4 shadow-[0_1px_2px_rgba(47,47,47,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(47,47,47,0.08)]"
+      className="group flex cursor-pointer flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-[0_1px_2px_rgba(47,47,47,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(47,47,47,0.08)] sm:flex-row sm:gap-5"
     >
-      <div className="relative h-[140px] w-[220px] shrink-0 overflow-hidden rounded-2xl bg-muted">
+      <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-2xl bg-muted sm:h-[140px] sm:w-[220px]">
         {bookmark.thumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={bookmark.thumbnail} alt="" className="h-full w-full object-cover" />
@@ -77,7 +77,7 @@ export function BookmarkCard({
           </div>
         )}
 
-        <div className="mt-auto flex items-center gap-4 pt-1 text-[11px] text-description">
+        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-[11px] text-description">
           <span className="flex items-center gap-1">
             <FolderIcon className="size-3.5" />
             {folder?.name ?? "미분류"}
