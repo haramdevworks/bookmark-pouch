@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { applyFetchedMetadata, createBookmark, deleteBookmark, updateBookmark } from "@/services/bookmarkService";
 import { fetchUrlMetadata } from "@/services/metadataService";
 import { analyzeAndSaveBookmark } from "@/services/aiService";
+import { linkTagsToBookmark } from "@/services/tagService";
 import type { UpdateBookmarkInput } from "@/types";
 
 export interface BookmarkFormState {
@@ -55,9 +56,12 @@ export async function createBookmarkAction(
   formData: FormData,
 ): Promise<BookmarkFormState> {
   const url = String(formData.get("url") ?? "");
+  const folderId = readFolderId(formData);
+  const tagId = String(formData.get("tagId") ?? "") || null;
 
   try {
-    const bookmark = await createBookmark({ url });
+    const bookmark = await createBookmark({ url, folderId });
+    if (tagId) await linkTagsToBookmark(bookmark.id, [tagId]);
     after(() => enrichBookmarkInBackground(bookmark.id, bookmark.url));
   } catch (error) {
     return { error: error instanceof Error ? error.message : "링크를 저장하지 못했습니다." };

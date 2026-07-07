@@ -186,15 +186,16 @@ export async function getBookmarkById(id: string): Promise<Bookmark | null> {
 }
 
 /**
- * 등록 모달은 URL만 받는다. 제목/설명/썸네일 등은 저장 직후 백그라운드에서
- * applyFetchedMetadata로 채워지고, 폴더/메모는 이후 수정 화면에서 채운다.
+ * 등록 모달은 URL(과 현재 선택된 폴더)만 받는다. 제목/설명/썸네일 등은 저장
+ * 직후 백그라운드에서 applyFetchedMetadata로 채워지고, 메모는 이후 수정
+ * 화면에서 채운다.
  */
 export async function createBookmark(input: CreateBookmarkInput): Promise<Bookmark> {
   const url = assertValidUrl(input.url);
 
   const { data, error } = await supabase
     .from("bookmarks")
-    .insert({ url, title: DEFAULT_TITLE })
+    .insert({ url, title: DEFAULT_TITLE, folder_id: input.folderId ?? null })
     .select(BOOKMARK_SELECT)
     .single();
 

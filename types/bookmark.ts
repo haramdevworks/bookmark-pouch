@@ -22,6 +22,7 @@ export interface Bookmark {
 
 export interface CreateBookmarkInput {
   url: string;
+  folderId?: string | null;
 }
 
 export interface UpdateBookmarkInput {

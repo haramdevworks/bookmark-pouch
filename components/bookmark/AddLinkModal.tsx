@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import { Plus } from "lucide-react";
 import {
   Dialog,
@@ -20,6 +21,9 @@ import { createBookmarkAction } from "@/app/actions/bookmark-actions";
  * 저장 직후 백그라운드에서 채워진다. 세부 내용은 저장 후 수정 화면에서 다듬는다.
  */
 export function AddLinkModal({ variant = "fab" }: { variant?: "fab" | "cta" }) {
+  const searchParams = useSearchParams();
+  const folderId = searchParams.get("folder");
+  const tagId = searchParams.get("tag");
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -69,6 +73,8 @@ export function AddLinkModal({ variant = "fab" }: { variant?: "fab" | "cta" }) {
         </DialogHeader>
 
         <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <input type="hidden" name="folderId" value={folderId ?? ""} />
+          <input type="hidden" name="tagId" value={tagId ?? ""} />
           <Input
             name="url"
             type="url"
@@ -77,6 +83,12 @@ export function AddLinkModal({ variant = "fab" }: { variant?: "fab" | "cta" }) {
             placeholder="https://example.com"
             className="h-9 rounded-xl px-3.5 text-[13px] focus-visible:border-primary focus-visible:ring-primary/30"
           />
+
+          {(folderId || tagId) && (
+            <p className="text-[12px] text-description">
+              지금 보고 있는 {folderId && tagId ? "폴더/태그" : folderId ? "폴더" : "태그"}로 저장돼요.
+            </p>
+          )}
 
           {error && <p className="text-[13px] text-destructive">{error}</p>}
 
