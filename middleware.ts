@@ -4,6 +4,13 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // 정적 파일은 미들웨어를 건너뛰기
+  if (pathname.startsWith("/_next/") || pathname.includes(".")) {
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -33,7 +40,6 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-  const pathname = request.nextUrl.pathname;
 
   // 인증되지 않은 사용자가 보호된 경로에 접속하려면 로그인 페이지로 리다이렉트
   if (!user && !pathname.startsWith("/auth")) {
