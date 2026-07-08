@@ -13,12 +13,8 @@ export function CreateFolderForm() {
   const [state, formAction, isPending] = useActionState(createFolderAction, initialState);
 
   useEffect(() => {
-    console.log("[CreateFolderForm] state:", state);
-
     if (!state.error) {
-      console.log("[CreateFolderForm] 성공, refresh 호출");
       formRef.current?.reset();
-      // 폴더 생성 후 목록 갱신
       router.refresh();
     }
   }, [state, router]);
