@@ -29,14 +29,17 @@ async function enrichBookmarkInBackground(id: string, url: string, userId: strin
     return;
   }
 
-  await analyzeAndSaveBookmark({
-    id: bookmark.id,
-    title: bookmark.title,
-    description: bookmark.description,
-    siteName: bookmark.siteName,
-    contentType: bookmark.contentType,
-    articleText,
-  });
+  await analyzeAndSaveBookmark(
+    {
+      id: bookmark.id,
+      title: bookmark.title,
+      description: bookmark.description,
+      siteName: bookmark.siteName,
+      contentType: bookmark.contentType,
+      articleText,
+    },
+    userId
+  );
 }
 
 export async function createBookmarkAction(

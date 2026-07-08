@@ -127,12 +127,12 @@ export async function generateBookmarkInsights(input: AiInsightInput): Promise<A
  * Gemini 호출이나 저장이 실패해도 예외를 던지지 않는다 — 이미 사용자에게는
  * 북마크 저장 응답이 전달된 뒤이므로, 실패는 조용히 무시하고 summary는 null로 남는다.
  */
-export async function analyzeAndSaveBookmark(bookmark: AiInsightInput & { id: string }): Promise<void> {
+export async function analyzeAndSaveBookmark(bookmark: AiInsightInput & { id: string }, userId: string): Promise<void> {
   const insights = await generateBookmarkInsights(bookmark);
   if (!insights) return;
 
   try {
-    await updateBookmarkAiInsights(bookmark.id, {
+    await updateBookmarkAiInsights(bookmark.id, userId, {
       summary: insights.summary,
       quotes: insights.quotes,
       aiTags: insights.tags,

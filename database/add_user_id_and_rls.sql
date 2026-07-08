@@ -115,3 +115,28 @@ create policy "Users can delete own bookmark_tags" on public.bookmark_tags
       and bookmarks.user_id = auth.uid()
     )
   );
+
+-- ---------------------------------------------------------------------------
+-- 5. search_bookmark_ids 함수 업데이트 - user_id 필터링 추가
+-- ---------------------------------------------------------------------------
+create or replace function public.search_bookmark_ids(search_term text)
+returns table (id uuid)
+language sql
+stable
+as $$
+  select b.id
+  from public.bookmarks b
+  where
+    b.user_id = auth.uid()
+    and (
+      b.title ilike '%' || search_term || '%'
+      or b.description ilike '%' || search_term || '%'
+      or b.url ilike '%' || search_term || '%'
+      or b.site_name ilike '%' || search_term || '%'
+      or b.memo ilike '%' || search_term || '%'
+      or b.content_type ilike '%' || search_term || '%'
+      or b.summary ilike '%' || search_term || '%'
+      or exists (select 1 from unnest(b.quotes) as quote where quote ilike '%' || search_term || '%')
+      or exists (select 1 from unnest(b.ai_tags) as tag where tag ilike '%' || search_term || '%')
+    );
+$$;

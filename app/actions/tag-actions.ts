@@ -14,6 +14,7 @@ export async function addTagToBookmarkAction(bookmarkId: string, name: string): 
 }
 
 export async function removeTagFromBookmarkAction(bookmarkId: string, tagId: string): Promise<void> {
+  const userId = await getUserId();
   await unlinkTagFromBookmark(bookmarkId, tagId);
 
   revalidatePath("/");
