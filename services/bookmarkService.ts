@@ -1,6 +1,32 @@
-import { supabase } from "@/lib/supabase";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import type { Bookmark, CreateBookmarkInput, Tag, UpdateBookmarkInput } from "@/types";
 import type { FetchedMetadata } from "./metadataService";
+
+async function getSupabaseClient() {
+  const cookieStore = await cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Handle errors silently
+          }
+        },
+      },
+    }
+  );
+}
+
 
 const DEFAULT_TITLE = "제목 없음";
 
@@ -142,7 +168,7 @@ export async function searchBookmarks(
     return getBookmarks(filters, userId);
   }
 
-  const { data: idRows, error: searchError } = await supabase.rpc("search_bookmark_ids", {
+  const { data: idRows, error: searchError } = await (await getSupabaseClient()).rpc("search_bookmark_ids", {
     search_term: trimmed,
   });
 
@@ -244,7 +270,7 @@ export async function updateBookmark(id: string, input: UpdateBookmarkInput, use
 }
 
 export async function deleteBookmark(id: string, userId: string): Promise<void> {
-  const { error } = await supabase.from("bookmarks").delete().eq("id", id).eq("user_id", userId);
+  const { error } = await (await getSupabaseClient()).from("bookmarks").delete().eq("id", id).eq("user_id", userId);
 
   if (error) {
     throw new Error("링크를 삭제하지 못했습니다.");
