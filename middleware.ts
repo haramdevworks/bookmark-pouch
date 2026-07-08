@@ -1,43 +1,48 @@
 import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicRoutes = ["/auth/login", "/auth/callback"];
-
 export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
-  // 공개 라우트면 통과
-  if (publicRoutes.includes(pathname)) {
-    return NextResponse.next();
-  }
-
-  // 인증 체크
-  let response = NextResponse.next();
+  const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll();
+          return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Handle errors silently
+          }
         },
       },
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+  const pathname = request.nextUrl.pathname;
 
-  // 로그인하지 않은 사용자는 로그인 페이지로 리다이렉트
-  if (!user?.id) {
+  // 인증되지 않은 사용자가 보호된 경로에 접속하려면 로그인 페이지로 리다이렉트
+  if (!user && !pathname.startsWith("/auth")) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
+  }
+
+  // 인증된 사용자가 로그인 페이지에 접속하면 홈으로 리다이렉트
+  if (user && pathname.startsWith("/auth")) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return response;
@@ -45,7 +50,12 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // 제외할 경로들
-    "/((?!_next/static|_next/image|favicon.ico|logo.png|.*\\.svg|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.gif|.*\\.webp).*))",
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };
