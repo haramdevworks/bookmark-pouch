@@ -13,6 +13,7 @@ import { CreateFolderForm } from "./CreateFolderForm";
 import { FolderList } from "./FolderList";
 import { TagList } from "./TagList";
 import { LogoutButton } from "./LogoutButton";
+import { UserProfile } from "./UserProfile";
 
 export async function Sidebar() {
   let folders: Awaited<ReturnType<typeof getFolders>> = [];
@@ -70,7 +71,10 @@ export async function Sidebar() {
 
       <div className="flex-grow" />
 
-      <LogoutButton />
+      <div className="flex flex-col gap-3">
+        <UserProfile />
+        <LogoutButton />
+      </div>
     </aside>
   );
 }
