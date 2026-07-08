@@ -20,14 +20,16 @@ if (!supabasePublishableKey) {
 export const supabase = createBrowserClient(supabaseUrl, supabasePublishableKey, {
   cookies: {
     getAll() {
+      if (typeof document === "undefined") return [];
       const cookies: { name: string; value: string }[] = [];
-      document.cookie.split('; ').forEach(cookie => {
-        const [name, ...rest] = cookie.split('=');
-        if (name) cookies.push({ name, value: rest.join('=') });
+      document.cookie.split("; ").forEach(cookie => {
+        const [name, ...rest] = cookie.split("=");
+        if (name) cookies.push({ name, value: rest.join("=") });
       });
       return cookies;
     },
     setAll(cookiesToSet) {
+      if (typeof document === "undefined") return;
       cookiesToSet.forEach(({ name, value, options }) => {
         let cookieString = `${name}=${value}`;
         if (options?.maxAge !== undefined) {
@@ -43,7 +45,7 @@ export const supabase = createBrowserClient(supabaseUrl, supabasePublishableKey,
           cookieString += `; Domain=${options.domain}`;
         }
         if (options?.secure) {
-          cookieString += '; Secure';
+          cookieString += "; Secure";
         }
         if (options?.sameSite) {
           cookieString += `; SameSite=${options.sameSite}`;
