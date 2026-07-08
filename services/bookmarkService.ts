@@ -119,7 +119,7 @@ async function getBookmarkIdsByTag(tagId: string, userId: string): Promise<strin
   // 사용자의 북마크만 필터링
   if (bookmarkIds.length === 0) return [];
 
-  const { data: bookmarks, error: filterError } = await supabase
+  const { data: bookmarks, error: filterError } = await (await getSupabaseClient())
     .from("bookmarks")
     .select("id")
     .in("id", bookmarkIds)
@@ -308,7 +308,7 @@ export async function updateBookmarkAiInsights(
   userId: string,
   insights: { summary: string; quotes: string[]; aiTags: string[] },
 ): Promise<void> {
-  const { error } = await supabase
+  const { error } = await (await getSupabaseClient())
     .from("bookmarks")
     .update({
       summary: insights.summary,
