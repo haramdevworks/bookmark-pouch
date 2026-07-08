@@ -8,59 +8,53 @@ import { FolderList } from "./FolderList";
 export function FolderListWithRefresh({ initialFolders }: { initialFolders: Folder[] }) {
   const [folders, setFolders] = useState(initialFolders);
   const [isLoading, setIsLoading] = useState(initialFolders.length === 0);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(initialFolders.length > 0);
 
   useEffect(() => {
     setFolders(initialFolders);
+    if (initialFolders.length > 0) {
+      setHasLoadedOnce(true);
+      setIsLoading(false);
+    }
+  }, [initialFolders]);
 
+  useEffect(() => {
     // 초기 데이터가 없으면 클라이언트에서 로드
-    if (initialFolders.length === 0) {
-      console.log("[FolderListWithRefresh] 초기 데이터 없음, 클라이언트에서 로드");
+    if (!hasLoadedOnce && folders.length === 0) {
       loadFolders();
     }
 
-    // auth 상태 변화 감지
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log("[FolderListWithRefresh] onAuthStateChange:", _event, session?.user?.email ? "user 있음" : "user 없음");
-
-      if (_event === "SIGNED_IN" && session?.user) {
-        console.log("[FolderListWithRefresh] 로그인됨, 폴더 재로드");
+    // auth 상태 변화 감지 - SIGNED_IN 이벤트만 처리
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event) => {
+      if (_event === "SIGNED_IN") {
         await loadFolders();
       } else if (_event === "SIGNED_OUT") {
         setFolders([]);
+        setHasLoadedOnce(false);
       }
     });
 
     return () => {
       subscription?.unsubscribe();
     };
-  }, [initialFolders]);
+  }, [hasLoadedOnce]);
 
   async function loadFolders() {
     try {
       setIsLoading(true);
-      console.log("[FolderListWithRefresh] 폴더 로드 시작");
-
-      const { data: { user }, error: getUserError } = await supabase.auth.getUser();
-      console.log("[FolderListWithRefresh] getUser 결과:", { email: user?.email, error: getUserError?.message });
+      const { data: { user } } = await supabase.auth.getUser();
 
       if (!user?.id) {
-        console.log("[FolderListWithRefresh] user 없음, userId로 로드 불가");
         setIsLoading(false);
         return;
       }
 
-      console.log("[FolderListWithRefresh] API 호출 시작: /api/folders?userId=" + user.id);
       const response = await fetch(`/api/folders?userId=${user.id}`);
-      console.log("[FolderListWithRefresh] API 응답 상태:", response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API error: ${response.status} - ${errorText}`);
-      }
+      if (!response.ok) throw new Error(`API error: ${response.status}`);
 
       const data = await response.json();
-      console.log("[FolderListWithRefresh] 폴더 로드 완료:", data.length, data);
       setFolders(data);
+      setHasLoadedOnce(true);
     } catch (error) {
       console.error("[FolderListWithRefresh] 폴더 불러오기 실패:", error);
     } finally {
