@@ -105,7 +105,7 @@ export interface BookmarkListFilters {
 }
 
 async function getBookmarkIdsByTag(tagId: string, userId: string): Promise<string[]> {
-  const { data, error } = await supabase
+  const { data, error } = await (await getSupabaseClient())
     .from("bookmark_tags")
     .select("bookmark_id")
     .eq("tag_id", tagId);
@@ -133,7 +133,7 @@ async function getBookmarkIdsByTag(tagId: string, userId: string): Promise<strin
 }
 
 export async function getBookmarks(filters: BookmarkListFilters = {}, userId: string): Promise<Bookmark[]> {
-  let queryBuilder = supabase
+  let queryBuilder = (await getSupabaseClient())
     .from("bookmarks")
     .select(BOOKMARK_SELECT)
     .eq("user_id", userId)
@@ -187,7 +187,7 @@ export async function searchBookmarks(
     if (ids.length === 0) return [];
   }
 
-  let queryBuilder = supabase
+  let queryBuilder = (await getSupabaseClient())
     .from("bookmarks")
     .select(BOOKMARK_SELECT)
     .eq("user_id", userId)
@@ -208,7 +208,7 @@ export async function searchBookmarks(
 }
 
 export async function getBookmarkById(id: string, userId: string): Promise<Bookmark | null> {
-  const { data, error } = await supabase
+  const { data, error } = await (await getSupabaseClient())
     .from("bookmarks")
     .select(BOOKMARK_SELECT)
     .eq("id", id)
@@ -225,7 +225,7 @@ export async function getBookmarkById(id: string, userId: string): Promise<Bookm
 export async function createBookmark(input: CreateBookmarkInput, userId: string): Promise<Bookmark> {
   const url = assertValidUrl(input.url);
 
-  const { data, error } = await supabase
+  const { data, error } = await (await getSupabaseClient())
     .from("bookmarks")
     .insert({
       url,
@@ -251,7 +251,7 @@ export async function updateBookmark(id: string, input: UpdateBookmarkInput, use
   if (input.memo !== undefined) patch.memo = input.memo?.trim() || null;
   if (input.folderId !== undefined) patch.folder_id = input.folderId;
 
-  const { data, error } = await supabase
+  const { data, error } = await (await getSupabaseClient())
     .from("bookmarks")
     .update(patch)
     .eq("id", id)
@@ -288,7 +288,7 @@ export async function applyFetchedMetadata(id: string, userId: string, metadata:
   if (metadata.title) patch.title = metadata.title;
   if (metadata.description) patch.description = metadata.description;
 
-  const { data, error } = await supabase
+  const { data, error } = await (await getSupabaseClient())
     .from("bookmarks")
     .update(patch)
     .eq("id", id)
