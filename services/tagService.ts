@@ -13,14 +13,11 @@ function mapRow(row: TagRow): Tag {
   return { id: row.id, name: row.name, createdAt: row.created_at };
 }
 
-/**
- * 태그 Service Layer.
- * 컴포넌트/Server Action은 이 파일을 통해서만 Supabase에 접근한다.
- */
-export async function getTags(): Promise<Tag[]> {
+export async function getTags(userId: string): Promise<Tag[]> {
   const { data, error } = await supabase
     .from("tags")
     .select(TAG_SELECT)
+    .eq("user_id", userId)
     .order("name", { ascending: true });
 
   if (error) {
@@ -30,7 +27,7 @@ export async function getTags(): Promise<Tag[]> {
   return (data as TagRow[]).map(mapRow);
 }
 
-export async function getTagsByBookmarkId(bookmarkId: string): Promise<Tag[]> {
+export async function getTagsByBookmarkId(bookmarkId: string, userId: string): Promise<Tag[]> {
   const { data, error } = await supabase
     .from("bookmark_tags")
     .select("tags ( id, name, created_at )")
@@ -40,13 +37,27 @@ export async function getTagsByBookmarkId(bookmarkId: string): Promise<Tag[]> {
     throw new Error("태그를 불러오지 못했습니다.");
   }
 
-  return ((data ?? []) as unknown as { tags: TagRow | null }[])
+  const tags = ((data ?? []) as unknown as { tags: TagRow | null }[])
     .map((row) => row.tags)
-    .filter((tag): tag is TagRow => Boolean(tag))
-    .map(mapRow);
+    .filter((tag): tag is TagRow => Boolean(tag));
+
+  const { data: verifiedTags, error: verifyError } = await supabase
+    .from("tags")
+    .select(TAG_SELECT)
+    .eq("user_id", userId)
+    .in(
+      "id",
+      tags.map((t) => t.id),
+    );
+
+  if (verifyError) {
+    throw new Error("태그를 검증하지 못했습니다.");
+  }
+
+  return ((verifiedTags ?? []) as TagRow[]).map(mapRow);
 }
 
-export async function createTag(name: string): Promise<Tag> {
+export async function createTag(name: string, userId: string): Promise<Tag> {
   const trimmed = name.trim();
   if (!trimmed) {
     throw new Error("태그 이름을 입력해주세요.");
@@ -54,7 +65,7 @@ export async function createTag(name: string): Promise<Tag> {
 
   const { data, error } = await supabase
     .from("tags")
-    .upsert({ name: trimmed }, { onConflict: "name" })
+    .upsert({ name: trimmed, user_id: userId }, { onConflict: "user_id,name" })
     .select(TAG_SELECT)
     .single();
 
@@ -92,7 +103,7 @@ export async function unlinkTagFromBookmark(bookmarkId: string, tagId: string): 
   }
 }
 
-export async function updateTag(id: string, name: string): Promise<Tag> {
+export async function updateTag(id: string, name: string, userId: string): Promise<Tag> {
   const trimmed = name.trim();
   if (!trimmed) {
     throw new Error("태그 이름을 입력해주세요.");
@@ -102,6 +113,7 @@ export async function updateTag(id: string, name: string): Promise<Tag> {
     .from("tags")
     .update({ name: trimmed })
     .eq("id", id)
+    .eq("user_id", userId)
     .select(TAG_SELECT)
     .single();
 
@@ -112,9 +124,8 @@ export async function updateTag(id: string, name: string): Promise<Tag> {
   return mapRow(data as TagRow);
 }
 
-// tags를 지우면 bookmark_tags도 함께 삭제된다 (FK on delete cascade).
-export async function deleteTag(id: string): Promise<void> {
-  const { error } = await supabase.from("tags").delete().eq("id", id);
+export async function deleteTag(id: string, userId: string): Promise<void> {
+  const { error } = await supabase.from("tags").delete().eq("id", id).eq("user_id", userId);
 
   if (error) {
     throw new Error("태그를 삭제하지 못했습니다.");

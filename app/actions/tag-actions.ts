@@ -2,9 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { createTag, deleteTag, linkTagsToBookmark, unlinkTagFromBookmark, updateTag } from "@/services/tagService";
+import { getUserId } from "@/lib/auth";
 
 export async function addTagToBookmarkAction(bookmarkId: string, name: string): Promise<void> {
-  const tag = await createTag(name);
+  const userId = await getUserId();
+  const tag = await createTag(name, userId);
   await linkTagsToBookmark(bookmarkId, [tag.id]);
 
   revalidatePath("/");
@@ -19,11 +21,13 @@ export async function removeTagFromBookmarkAction(bookmarkId: string, tagId: str
 }
 
 export async function updateTagAction(id: string, name: string): Promise<void> {
-  await updateTag(id, name);
+  const userId = await getUserId();
+  await updateTag(id, name, userId);
   revalidatePath("/");
 }
 
 export async function deleteTagAction(id: string): Promise<void> {
-  await deleteTag(id);
+  const userId = await getUserId();
+  await deleteTag(id, userId);
   revalidatePath("/");
 }

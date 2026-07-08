@@ -1,5 +1,6 @@
 import { getBookmarks, searchBookmarks } from "@/services/bookmarkService";
 import { getFolders } from "@/services/folderService";
+import { getUserId } from "@/lib/auth";
 import { BookmarkCard } from "@/components/bookmark/BookmarkCard";
 import { AddLinkModal } from "@/components/bookmark/AddLinkModal";
 import { AutoRefresh } from "@/components/bookmark/AutoRefresh";
@@ -14,10 +15,11 @@ export default async function HomePage({
   const { q, folder, tag } = await searchParams;
   const query = q?.trim() ?? "";
   const filters = { folderId: folder || undefined, tagId: tag || undefined };
+  const userId = await getUserId();
 
   const [bookmarks, folders] = await Promise.all([
-    query ? searchBookmarks(query, filters) : getBookmarks(filters),
-    getFolders(),
+    query ? searchBookmarks(query, filters, userId) : getBookmarks(filters, userId),
+    getFolders(userId),
   ]);
   const folderById = new Map(folders.map((folder) => [folder.id, folder]));
   const hasPendingEnrichment = bookmarks.some((bookmark) => bookmark.title === "제목 없음");

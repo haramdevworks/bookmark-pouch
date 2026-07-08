@@ -13,14 +13,11 @@ function mapRow(row: FolderRow): Folder {
   return { id: row.id, name: row.name, createdAt: row.created_at };
 }
 
-/**
- * 폴더 Service Layer.
- * 컴포넌트/Server Action은 이 파일을 통해서만 Supabase에 접근한다.
- */
-export async function getFolders(): Promise<Folder[]> {
+export async function getFolders(userId: string): Promise<Folder[]> {
   const { data, error } = await supabase
     .from("folders")
     .select(FOLDER_SELECT)
+    .eq("user_id", userId)
     .order("created_at", { ascending: true });
 
   if (error) {
@@ -30,11 +27,12 @@ export async function getFolders(): Promise<Folder[]> {
   return (data as FolderRow[]).map(mapRow);
 }
 
-export async function getFolderById(id: string): Promise<Folder | null> {
+export async function getFolderById(id: string, userId: string): Promise<Folder | null> {
   const { data, error } = await supabase
     .from("folders")
     .select(FOLDER_SELECT)
     .eq("id", id)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (error) {
@@ -44,7 +42,7 @@ export async function getFolderById(id: string): Promise<Folder | null> {
   return data ? mapRow(data as FolderRow) : null;
 }
 
-export async function createFolder(input: CreateFolderInput): Promise<Folder> {
+export async function createFolder(input: CreateFolderInput, userId: string): Promise<Folder> {
   const name = input.name.trim();
   if (!name) {
     throw new Error("폴더 이름을 입력해주세요.");
@@ -52,7 +50,7 @@ export async function createFolder(input: CreateFolderInput): Promise<Folder> {
 
   const { data, error } = await supabase
     .from("folders")
-    .insert({ name })
+    .insert({ name, user_id: userId })
     .select(FOLDER_SELECT)
     .single();
 
@@ -63,7 +61,7 @@ export async function createFolder(input: CreateFolderInput): Promise<Folder> {
   return mapRow(data as FolderRow);
 }
 
-export async function updateFolder(id: string, name: string): Promise<Folder> {
+export async function updateFolder(id: string, name: string, userId: string): Promise<Folder> {
   const trimmed = name.trim();
   if (!trimmed) {
     throw new Error("폴더 이름을 입력해주세요.");
@@ -73,6 +71,7 @@ export async function updateFolder(id: string, name: string): Promise<Folder> {
     .from("folders")
     .update({ name: trimmed })
     .eq("id", id)
+    .eq("user_id", userId)
     .select(FOLDER_SELECT)
     .single();
 
@@ -83,9 +82,8 @@ export async function updateFolder(id: string, name: string): Promise<Folder> {
   return mapRow(data as FolderRow);
 }
 
-// 폴더를 삭제해도 안의 북마크는 삭제되지 않는다 (FK가 on delete set null이라 미분류로 이동).
-export async function deleteFolder(id: string): Promise<void> {
-  const { error } = await supabase.from("folders").delete().eq("id", id);
+export async function deleteFolder(id: string, userId: string): Promise<void> {
+  const { error } = await supabase.from("folders").delete().eq("id", id).eq("user_id", userId);
 
   if (error) {
     throw new Error("폴더를 삭제하지 못했습니다.");

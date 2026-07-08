@@ -1,0 +1,121 @@
+
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+        <title>글쓰기</title>
+
+    <link rel="stylesheet" href="https://t1.daumcdn.net/tistory_admin/www/style/font.css">
+    <link rel="stylesheet" href="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/style/editor-plugins.css">
+    <link rel="stylesheet" href="https://tistory1.daumcdn.net/tistory_admin/manage/manage-ee0ebd71789a16e62d4eba556cf4b670a8cbe1de/manage-static/style/post-editor.min.css">
+    <style>
+        .photos-container {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 60000;
+            display: none
+        }
+
+        .googleRecaptcha {
+            height: 88px;
+            padding: 5px 0
+        }
+    </style>
+</head>
+
+<body id="editor-root" class="tistory">
+<div id="post-editor-app" class="post-editor">
+    <div class="box_loading">
+        <span class="ico_blog ico_loading">로딩중입니다.</span>
+    </div>
+</div>
+<div id="photosContainer" class="photos-container"></div>
+
+<script>
+  window.Config = {
+    production: true,
+    service: 'tistory',
+    blog: {"image":"https:\/\/tistory1.daumcdn.net\/tistory\/8070408\/attach\/fa22ea4337dd42aea68ee92270aad65d","domain":"https:\/\/haramdevworks.tistory.com","manageUrl":"https:\/\/haramdevworks.tistory.com\/manage","customDomain":"","title":"제가 오늘 배운 것은요....","categories":[{"id":1307713,"name":"TIL","label":"TIL","priority":0,"entries":57,"visibility":20,"viewChannel":null,"children":[],"leaf":true,"categoryInfo":{"liststyle":"","image":"","description":""}},{"id":1311944,"name":"notes","label":"notes","priority":1,"entries":34,"visibility":20,"viewChannel":null,"children":[],"leaf":true,"categoryInfo":{"liststyle":"","image":"","description":""}},{"id":1263655,"name":"archives","label":"archives","priority":2,"entries":9,"visibility":20,"viewChannel":null,"children":[],"leaf":true,"categoryInfo":{"liststyle":"","image":"","description":""}},{"id":1263656,"name":"memo","label":"memo","priority":3,"entries":2,"visibility":20,"viewChannel":null,"children":[],"leaf":true,"categoryInfo":{"liststyle":"","image":"","description":""}}],"blogSettings":{"blogId":"8070408","url":"","logo":"t\/8070408@fa22ea4337dd42aea68ee92270aad65d","logoLabel":"","logoWidth":"0","logoHeight":"0","entriesOnPage":"6","entriesOnList":"6","entriesOnRSS":"10","publishWholeOnRSS":"1","allowWriteOnGuestbook":"1","allowWriteDoubleCommentOnGuestbook":"0","commentWritePermission":"1","useCommentRecognition":"0","useGuestbookRecognition":"0","language":"ko","timezone":"Asia\/Seoul","showLocalSearchTag":"1","useSlogan":"0","description":"문제가 될까요?"},"activePlugins":["AddLinkToPostWithSearch","AD_Referer_Default","AD_Visitor_Default","DaumShow","DragSearchHandler","EnglishPatient","EnglishSeriousPatient","lightbox","LocationTag","PostListinCategory","refererkeyword","SyntaxHighlight"],"plugins":[{"name":"prev-post","title":"이전 발행 글 넣기","url":"\/plugin\/AddLinkToPostWithSearch\/","width":450,"height":570,"scroll":1}],"created":"2025-06-17","visibilityType":"0","visibility":20,"useMobileSkin":false,"skinInfo":{"name":"customize\/8070408","title":"밤 S08","version":"1.0","license":"저작권 표시 제거 금지 \/ 재배포 금지","description":"","layout":"etc","author":{"name":"밤","email":"total_eclipse@daum.net","homePage":"http:\/\/totaleclipse.kr"},"preview":"https:\/\/tistory1.daumcdn.net\/tistory\/8070408\/skinArchive\/8070408_1750146183\/preview560.jpg","preview560":"","preview1600":"","useWizard":false,"useBlogmenu":false,"default":"{\"recentEntries\":\"3\",\"recentComments\":\"10\",\"itemsOnGuestbook\":\"3\",\"tagsInCloud\":\"10\",\"sortInCloud\":\"1\",\"expandComment\":\"0\",\"lengthOfRecentNotice\":\"30\",\"lengthOfRecentEntry\":\"30\",\"lengthOfRecentComment\":\"30\",\"lengthOfLink\":\"30\",\"entriesOnPage\":\"6\",\"entriesOnList\":\"6\",\"showListLock\":\"1\",\"showListOnCategory\":\"2\",\"showListOnHome\":\"2\",\"commentMessage\":{\"none\":\"0\",\"single\":\"1\"},\"tree\":{\"showValue\":\"0\"},\"liststyle\":\"type-card\",\"cover\":\"\\n\\t\\t\\t\\n\\t\\t\\t\\t[{\\n\\t\\t\\t\\t\\t\\\"name\\\": \\\"slider\\\",\\n\\t\\t\\t\\t\\t\\\"title\\\": \\\"Latest Posts\\\",\\n\\t\\t\\t\\t\\t\\\"dataType\\\": \\\"RECENT\\\",\\n\\t\\t\\t\\t\\t\\\"data\\\": {\\n\\t\\t\\t\\t\\t\\t\\\"category\\\": \\\"ALL\\\",\\n\\t\\t\\t\\t\\t\\t\\\"size\\\": 5\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t},\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\\"name\\\": \\\"notice\\\",\\n\\t\\t\\t\\t\\t\\\"title\\\": \\\"Hello!\\\",\\n\\t\\t\\t\\t\\t\\\"dataType\\\": \\\"CUSTOM\\\",\\n\\t\\t\\t\\t\\t\\\"data\\\": [\\n\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\t\\\"title\\\": \\\"공지사항\\\",\\n\\t\\t\\t\\t\\t\\t\\t\\\"summary\\\": \\\"공지 내용을 수정해 주세요.<br>커버 &gt; 공지사항 수정 &gt; 콘텐츠 &quot;직접 입력&quot; 선택 &gt; 새 글 추가 또는 수정\\\",\\n\\t\\t\\t\\t\\t\\t\\t\\\"url\\\": \\\"\\\",\\n\\t\\t\\t\\t\\t\\t\\t\\\"thumbnail\\\": \\\"\\\"\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t]\\n\\t\\t\\t\\t},\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\\"name\\\": \\\"type-card\\\",\\n\\t\\t\\t\\t\\t\\\"title\\\": \\\"Photos\\\",\\n\\t\\t\\t\\t\\t\\\"dataType\\\": \\\"RECENT\\\",\\n\\t\\t\\t\\t\\t\\\"data\\\": {\\n\\t\\t\\t\\t\\t\\t\\\"category\\\": \\\"ALL\\\",\\n\\t\\t\\t\\t\\t\\t\\\"size\\\": 3\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}]\\n\\t\\t\\t\\n\\t\\t\"}","variables":"[{\"name\":\"설정\",\"items\":[{\"name\":\"desc\",\"label\":\"블로그 소개\",\"type\":\"STRING\",\"default\":\"Blog\",\"option\":null,\"description\":null},{\"name\":\"width\",\"label\":\"본문 폭 (기본값 540)\",\"type\":\"STRING\",\"default\":\"540\",\"option\":null,\"description\":null},{\"name\":\"zoom\",\"label\":\"폰트 크기\",\"type\":\"SELECT\",\"default\":\"normal\",\"option\":\"[\\n\\t\\t\\t\\t\\t\\t\\t{\\\"name\\\": \\\"normal\\\", \\\"label\\\": \\\"기본\\\", \\\"value\\\": \\\"normal\\\"},\\n\\t\\t\\t\\t\\t\\t\\t{\\\"name\\\": \\\"zoom\\\", \\\"label\\\": \\\"크게 (본문 폭 600 이상으로 설정 시 권장)\\\", \\\"value\\\": \\\"zoom\\\"}\\n\\t\\t\\t\\t\\t\\t]\",\"description\":null},{\"name\":\"related\",\"label\":\"본문 연관글 표시\",\"type\":\"BOOL\",\"default\":\"true\",\"option\":null,\"description\":null},{\"name\":\"count\",\"label\":\"버튼에 댓글 수와 공감 수 표시\",\"type\":\"BOOL\",\"default\":\"true\",\"option\":null,\"description\":null}],\"type\":\"GROUP\"},{\"name\":\"링크\",\"items\":[{\"name\":\"twitter\",\"label\":\"트위터 ID\",\"type\":\"STRING\",\"default\":null,\"option\":null,\"description\":null},{\"name\":\"instagram\",\"label\":\"인스타그램 ID\",\"type\":\"STRING\",\"default\":null,\"option\":null,\"description\":null},{\"name\":\"link1name\",\"label\":\"링크1 이름\",\"type\":\"STRING\",\"default\":null,\"option\":null,\"description\":null},{\"name\":\"link1\",\"label\":\"링크1 URL\",\"type\":\"STRING\",\"default\":null,\"option\":null,\"description\":null},{\"name\":\"link2name\",\"label\":\"링크2 이름\",\"type\":\"STRING\",\"default\":null,\"option\":null,\"description\":null},{\"name\":\"link2\",\"label\":\"링크2 URL\",\"type\":\"STRING\",\"default\":null,\"option\":null,\"description\":null},{\"name\":\"link3name\",\"label\":\"링크3 이름\",\"type\":\"STRING\",\"default\":null,\"option\":null,\"description\":null},{\"name\":\"link3\",\"label\":\"링크3 URL\",\"type\":\"STRING\",\"default\":null,\"option\":null,\"description\":null}],\"type\":\"GROUP\"}]","liststyle":"[{\"label\":\"카드\",\"value\":\"type-card\"},{\"label\":\"웹진 L\",\"value\":\"type-webzine-l\"},{\"label\":\"웹진 S\",\"value\":\"type-webzine-s\"},{\"label\":\"갤러리 3단\",\"value\":\"type-gallery col-3\"},{\"label\":\"갤러리 2단\",\"value\":\"type-gallery col-2\"},{\"label\":\"갤러리 1단\",\"value\":\"type-gallery col-1\"}]","cover":"[{\"name\":\"slider\",\"label\":\"슬라이더\",\"description\":\"\"},{\"name\":\"notice\",\"label\":\"공지사항\",\"description\":\"\"},{\"name\":\"type-card\",\"label\":\"카드\",\"description\":\"\"},{\"name\":\"type-webzine-l\",\"label\":\"웹진 L\",\"description\":\"\"},{\"name\":\"type-webzine-s\",\"label\":\"웹진 S\",\"description\":\"\"},{\"name\":\"type-gallery-col-3\",\"label\":\"갤러리 3단\",\"description\":\"\"},{\"name\":\"type-gallery-col-2\",\"label\":\"갤러리 2단\",\"description\":\"\"},{\"name\":\"type-gallery-col-1\",\"label\":\"갤러리 1단\",\"description\":\"\"}]","demoUrl":"","skinUrl":"","showcaseCoverContent":"","showcaseImages":"","showcaseSettingContent":"","showcaseVariableContent":""},"targetNotification":[],"cclCommercial":0,"cclDerive":0,"uselessMargin":"1","useMobile":"0"},
+    user: {"userId":"7385755","role":"owner","accountType":"kakao","roleLabel":"소유자","name":"haramworks","loginId":"haramdevworks@gmail.com","profileImageUrl":"https:\/\/tistory1.daumcdn.net\/tistory\/8070408\/attach\/fa22ea4337dd42aea68ee92270aad65d","thirdProvideAgree":true},
+    blogs: {"ownerBlogs":[{"id":"8070408","name":"haramdevworks","defaultUrl":"https:\/\/haramdevworks.tistory.com","adminUrl":"http:\/\/haramdevworks.tistory.com\/manage","title":"제가 오늘 배운 것은요...."}],"memberBlogs":[]},
+    post: {},
+    postType: "post",
+    attachments: [],
+    keditor_base_url: "https://t1.kakaocdn.net/axz_keditor/dist/0.9.0",
+    MAX_ATTACHMENT_COUNT: 50,
+    draftCount: 2,
+    useBlogList: true,
+    frontSentry: "https:\/\/50846f827939437fb91ae430e8689a6d@aem-kakao-collector.onkakao.net\/5219",
+    attachmentRawData: [],
+    revenue: [],
+    shouldConvert: false,
+    emoticons: [
+    ]
+  }
+
+  window.appInfo = {
+    service: 'tistory',
+    kakaoTvServiceKey: "daum_tistory",
+    kakaoTvPopupUrl: "https:\/\/tv.kakao.com\/uploader\/kakao\/popup?service=daum_tistory",
+    domain: "tistory.com",
+    topUrl: "https://www.tistory.com",
+    loginUrl: "https://www.tistory.com/auth/login",
+    logoutUrl: "https://www.tistory.com/auth/logout",
+    memberUrl: "https://www.tistory.com/member",
+    gnbBaseUrl: "https://www.tistory.com/accio",
+    manageUrl: "https://haramdevworks.tistory.com/manage",
+    kageUrl: "https://blog.kakaocdn.net",
+    thumbnailBaseUrl: "https://img1.daumcdn.net/thumb",
+    returnUrl: "/manage/posts/",
+    fontStyleUrl: "https://t1.daumcdn.net/tistory_admin/www/style/font.css",
+    contentStyleUrl: "https://tistory1.daumcdn.net/tistory_admin/manage/manage-ee0ebd71789a16e62d4eba556cf4b670a8cbe1de/manage-static/style/editor-content.css",
+    needCaptcha: false
+  }
+
+  window.daumLikeCategories = [{"value":"1000","label":"여행·맛집","subItems":[{"value":"201","label":"국내여행"},{"value":"202","label":"해외여행"},{"value":"203","label":"캠핑·등산"},{"value":"204","label":"맛집"},{"value":"205","label":"카페·디저트"}]},{"value":"2000","label":"리빙·스타일","subItems":[{"value":"105","label":"생활정보"},{"value":"111","label":"인테리어"},{"value":"112","label":"패션·뷰티"},{"value":"109","label":"요리"}]},{"value":"3000","label":"가족·연애","subItems":[{"value":"101","label":"일상"},{"value":"103","label":"연애·결혼"},{"value":"104","label":"육아"},{"value":"102","label":"해외생활"},{"value":"114","label":"군대"},{"value":"106","label":"반려동물"}]},{"value":"4000","label":"직장·자기계발","subItems":[{"value":"401","label":"IT 인터넷"},{"value":"402","label":"모바일"},{"value":"404","label":"과학"},{"value":"405","label":"IT 제품리뷰"},{"value":"606","label":"경영·직장"}]},{"value":"5000","label":"시사·지식","subItems":[{"value":"601","label":"정치"},{"value":"602","label":"사회"},{"value":"603","label":"교육"},{"value":"604","label":"국제"},{"value":"605","label":"경제"}]},{"value":"6000","label":"도서·창작","subItems":[{"value":"305","label":"책"},{"value":"308","label":"창작"}]},{"value":"7000","label":"엔터테인먼트","subItems":[{"value":"301","label":"TV"},{"value":"302","label":"스타"},{"value":"303","label":"영화"},{"value":"304","label":"음악"},{"value":"306","label":"만화·애니"},{"value":"307","label":"공연·전시·축제"}]},{"value":"8000","label":"취미·건강","subItems":[{"value":"107","label":"취미"},{"value":"113","label":"건강"},{"value":"506","label":"스포츠일반"},{"value":"501","label":"축구"},{"value":"502","label":"야구"},{"value":"503","label":"농구"},{"value":"504","label":"배구"},{"value":"505","label":"골프"},{"value":"110","label":"자동차"},{"value":"403","label":"게임"},{"value":"108","label":"사진"}]}];
+
+  window.user = window.Config.user
+</script>
+
+<link rel="stylesheet"
+      href="//t1.kakaocdn.net/axz_keditor/photos-web/dist/0.2.10/KeditorPhotosEditor.min.css">
+<script src="//t1.kakaocdn.net/axz_keditor/photos-web/dist/0.2.10/KeditorPhotosEditor.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/polyfill.min.js"></script>
+<script src="https://t1.daumcdn.net/keditor/tinymce/4.9.6/tinymce.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/themes/classic/theme.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/codeblock/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/html/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/maps/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/kImage/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/fileUpload/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/video/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/kData/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/location/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/simpleTable/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/klink/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/kPaste/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/colorPalette/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/grammarCheck/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/kOpengraph/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/styleFormat/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/kList/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/hrList/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/moreLess/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/fontSelect/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/imageSlide/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/kTable/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/kCharmap/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/blockquoteList/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/kEmoticon/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/kShortcut/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/kAlign/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/kContentSearch/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/plugins/sentry/plugin.min.js"></script>
+<script type="text/javascript" src="https://t1.kakaocdn.net/axz_keditor/dist/0.9.0/langs/ko_KR.min.js"></script>
+<script src="https://tistory1.daumcdn.net/tistory_admin/manage/manage-ee0ebd71789a16e62d4eba556cf4b670a8cbe1de/manage-static/script/post-editor.min.js"></script>
+<script type="text/javascript" src="//t1.daumcdn.net/tiara/js/v1/tiara-1.2.0.min.js"></script>
+</body>
+</html>
