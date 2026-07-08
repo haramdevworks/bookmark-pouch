@@ -17,6 +17,16 @@ export default function LoginPage() {
       }
     };
     checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        router.push("/");
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [router]);
 
   async function handleGoogleLogin() {
@@ -48,7 +58,7 @@ export default function LoginPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="POUCH" className="mx-auto h-12 w-auto mb-4" />
           <p className="mt-2 text-[13px] text-description">
-            리서치 자료를 한곳에서 관리하세요.
+            스마트 리서치 북마크
           </p>
         </div>
 

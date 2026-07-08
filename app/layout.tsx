@@ -3,6 +3,7 @@ import "pretendard/dist/web/variable/pretendardvariable.css";
 import "./globals.css";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { LayoutClient } from "@/components/layout/LayoutClient";
 
 export const metadata: Metadata = {
   title: "POUCH",
@@ -20,12 +21,13 @@ export default function RootLayout({
   return (
     <html lang="ko" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-background text-foreground md:flex-row">
-        <MobileNav>
-          <Sidebar />
-        </MobileNav>
-        <main className="min-w-0 flex-1">
-          <div className="mx-auto max-w-[1200px] px-4 py-6 md:px-8 md:py-8">{children}</div>
-        </main>
+        <LayoutClient nav={
+          <MobileNav>
+            <Sidebar />
+          </MobileNav>
+        }>
+          {children}
+        </LayoutClient>
       </body>
     </html>
   );
