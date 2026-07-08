@@ -8,9 +8,11 @@ import {
 } from "@/components/ui/accordion";
 import { getFolders } from "@/services/folderService";
 import { getTags } from "@/services/tagService";
+import { getUserId } from "@/lib/auth";
 import { CreateFolderForm } from "./CreateFolderForm";
 import { FolderList } from "./FolderList";
 import { TagList } from "./TagList";
+import { LogoutButton } from "./LogoutButton";
 
 export async function Sidebar() {
   let folders: Awaited<ReturnType<typeof getFolders>> = [];
@@ -18,7 +20,8 @@ export async function Sidebar() {
   let hasLoadError = false;
 
   try {
-    [folders, tags] = await Promise.all([getFolders(), getTags()]);
+    const userId = await getUserId();
+    [folders, tags] = await Promise.all([getFolders(userId), getTags(userId)]);
   } catch {
     hasLoadError = true;
   }
@@ -64,6 +67,10 @@ export async function Sidebar() {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
+
+      <div className="flex-grow" />
+
+      <LogoutButton />
     </aside>
   );
 }
