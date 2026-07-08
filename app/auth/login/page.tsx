@@ -8,6 +8,8 @@ export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     const checkSession = async () => {
@@ -51,6 +53,33 @@ export default function LoginPage() {
     }
   }
 
+  async function handleEmailLogin(e: React.FormEvent) {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      setError("이메일과 비밀번호를 입력해주세요.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (error) {
+        setError(error.message);
+      }
+    } catch (err) {
+      setError("로그인에 실패했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm rounded-xl border border-border bg-card p-8 shadow-sm">
@@ -68,6 +97,43 @@ export default function LoginPage() {
           </div>
         )}
 
+        {/* 이메일/비밀번호 로그인 */}
+        <form onSubmit={handleEmailLogin} className="mb-4 flex flex-col gap-3">
+          <input
+            type="email"
+            placeholder="이메일"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
+            className="h-9 rounded-lg border border-border bg-background px-3 text-[13px] outline-none focus:border-primary disabled:opacity-60"
+          />
+          <input
+            type="password"
+            placeholder="비밀번호"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+            className="h-9 rounded-lg border border-border bg-background px-3 text-[13px] outline-none focus:border-primary disabled:opacity-60"
+          />
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="h-9 rounded-lg bg-primary text-[13px] font-semibold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
+          >
+            {isLoading ? "로그인 중..." : "로그인"}
+          </button>
+        </form>
+
+        <div className="relative mb-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-[12px]">
+            <span className="bg-card px-2 text-description">또는</span>
+          </div>
+        </div>
+
+        {/* Google 로그인 */}
         <button
           onClick={handleGoogleLogin}
           disabled={isLoading}
