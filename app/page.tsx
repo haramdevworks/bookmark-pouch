@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getBookmarks, searchBookmarks } from "@/services/bookmarkService";
 import { getFolders } from "@/services/folderService";
 import { getUserId } from "@/lib/auth";
@@ -15,7 +16,13 @@ export default async function HomePage({
   const { q, folder, tag } = await searchParams;
   const query = q?.trim() ?? "";
   const filters = { folderId: folder || undefined, tagId: tag || undefined };
-  const userId = await getUserId();
+
+  let userId: string;
+  try {
+    userId = await getUserId();
+  } catch {
+    redirect("/auth/login");
+  }
 
   const [bookmarks, folders] = await Promise.all([
     query ? searchBookmarks(query, filters, userId) : getBookmarks(filters, userId),

@@ -3,19 +3,12 @@ import type { NextRequest } from "next/server";
 
 const publicRoutes = ["/auth/login", "/auth/callback"];
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // 쿠키에서 인증 토큰 확인
-  const authToken = request.cookies.get("sb-access-token");
-  const isAuthenticated = !!authToken;
-
-  if (!isAuthenticated && !publicRoutes.includes(pathname)) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
-  }
-
-  if (isAuthenticated && publicRoutes.includes(pathname)) {
-    return NextResponse.redirect(new URL("/", request.url));
+  // 공개 라우트면 통과 (인증 체크는 Server Component에서 수행)
+  if (publicRoutes.includes(pathname)) {
+    return NextResponse.next();
   }
 
   return NextResponse.next();
