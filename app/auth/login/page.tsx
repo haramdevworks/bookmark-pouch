@@ -47,9 +47,8 @@ export default function LoginPage() {
         <div className="mb-8 text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="POUCH" className="mx-auto h-12 w-auto mb-4" />
-          <h1 className="text-xl font-bold text-foreground">POUCH</h1>
           <p className="mt-2 text-[13px] text-description">
-            리서치 자료를 한곳에서 관리하세요
+            리서치 자료를 한곳에서 관리하세요.
           </p>
         </div>
 
