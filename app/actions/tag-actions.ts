@@ -7,7 +7,7 @@ import { getUserId } from "@/lib/auth";
 export async function addTagToBookmarkAction(bookmarkId: string, name: string): Promise<void> {
   const userId = await getUserId();
   const tag = await createTag(name, userId);
-  await linkTagsToBookmark(bookmarkId, [tag.id]);
+  await linkTagsToBookmark(bookmarkId, [tag.id], userId);
 
   revalidatePath("/");
   revalidatePath(`/links/${bookmarkId}`);

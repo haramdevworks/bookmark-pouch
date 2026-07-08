@@ -104,19 +104,37 @@ export async function createTag(name: string, userId: string): Promise<Tag> {
   return mapRow(data as TagRow);
 }
 
-export async function linkTagsToBookmark(bookmarkId: string, tagIds: string[]): Promise<void> {
+export async function linkTagsToBookmark(bookmarkId: string, tagIds: string[], userId: string): Promise<void> {
   if (tagIds.length === 0) return;
 
   const supabase = await getSupabaseClient();
-  const { error } = await supabase
-    .from("bookmark_tags")
-    .upsert(
-      tagIds.map((tagId) => ({ bookmark_id: bookmarkId, tag_id: tagId })),
-      { onConflict: "bookmark_id,tag_id" },
-    );
+  console.log("[linkTagsToBookmark] 시작:", { bookmarkId, tagIds, userId });
 
-  if (error) {
-    throw new Error("태그를 연결하지 못했습니다.");
+  // onConflict 없이 단순 insert 시도 (delete후 insert)
+  try {
+    // 먼저 기존 관계 삭제
+    await supabase
+      .from("bookmark_tags")
+      .delete()
+      .eq("bookmark_id", bookmarkId)
+      .in("tag_id", tagIds);
+
+    // 새로 insert (user_id 제외 - 테이블 기본값에 의존)
+    const { error: insertError } = await supabase
+      .from("bookmark_tags")
+      .insert(
+        tagIds.map((tagId) => ({ bookmark_id: bookmarkId, tag_id: tagId })),
+      );
+
+    if (insertError) {
+      console.error("[linkTagsToBookmark] Insert error:", insertError);
+      throw new Error(`태그를 연결하지 못했습니다: ${insertError.message}`);
+    }
+
+    console.log("[linkTagsToBookmark] 완료");
+  } catch (error) {
+    console.error("[linkTagsToBookmark] Error:", error);
+    throw error;
   }
 }
 

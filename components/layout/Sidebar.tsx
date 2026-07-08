@@ -10,8 +10,8 @@ import { getFolders } from "@/services/folderService";
 import { getTags } from "@/services/tagService";
 import { getUserId } from "@/lib/auth";
 import { CreateFolderForm } from "./CreateFolderForm";
-import { FolderList } from "./FolderList";
-import { TagList } from "./TagList";
+import { FolderListWithRefresh } from "./FolderListWithRefresh";
+import { TagListWithRefresh } from "./TagListWithRefresh";
 import { LogoutButton } from "./LogoutButton";
 import { UserProfile } from "./UserProfile";
 
@@ -23,8 +23,12 @@ export async function Sidebar() {
   try {
     const userId = await getUserId();
     [folders, tags] = await Promise.all([getFolders(userId), getTags(userId)]);
-  } catch {
-    hasLoadError = true;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage !== "Unauthorized") {
+      console.error("[Sidebar] 폴더/태그 불러오기 실패:", error);
+      hasLoadError = true;
+    }
   }
 
   return (
@@ -49,7 +53,7 @@ export async function Sidebar() {
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <FolderList folders={folders} />
+            <FolderListWithRefresh initialFolders={folders} />
             <CreateFolderForm />
           </AccordionContent>
         </AccordionItem>
@@ -63,7 +67,7 @@ export async function Sidebar() {
           </AccordionTrigger>
           <AccordionContent>
             <div className="px-2 pt-1.5">
-              <TagList tags={tags} />
+              <TagListWithRefresh initialTags={tags} />
             </div>
           </AccordionContent>
         </AccordionItem>

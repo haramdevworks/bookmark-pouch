@@ -31,6 +31,11 @@ export async function getUserId(): Promise<string> {
     data: { user },
   } = await supabase.auth.getUser();
 
+  console.log("[auth.ts] getUser 결과:", {
+    user: user ? { id: user.id, email: user.email } : null,
+    session: "check cookies"
+  });
+
   if (!user?.id) {
     throw new Error("Unauthorized");
   }

@@ -17,4 +17,39 @@ if (!supabasePublishableKey) {
   );
 }
 
-export const supabase = createBrowserClient(supabaseUrl, supabasePublishableKey);
+export const supabase = createBrowserClient(supabaseUrl, supabasePublishableKey, {
+  cookies: {
+    getAll() {
+      const cookies: { name: string; value: string }[] = [];
+      document.cookie.split('; ').forEach(cookie => {
+        const [name, ...rest] = cookie.split('=');
+        if (name) cookies.push({ name, value: rest.join('=') });
+      });
+      return cookies;
+    },
+    setAll(cookiesToSet) {
+      cookiesToSet.forEach(({ name, value, options }) => {
+        let cookieString = `${name}=${value}`;
+        if (options?.maxAge !== undefined) {
+          cookieString += `; Max-Age=${options.maxAge}`;
+        }
+        if (options?.expires) {
+          cookieString += `; Expires=${new Date(options.expires).toUTCString()}`;
+        }
+        if (options?.path) {
+          cookieString += `; Path=${options.path}`;
+        }
+        if (options?.domain) {
+          cookieString += `; Domain=${options.domain}`;
+        }
+        if (options?.secure) {
+          cookieString += '; Secure';
+        }
+        if (options?.sameSite) {
+          cookieString += `; SameSite=${options.sameSite}`;
+        }
+        document.cookie = cookieString;
+      });
+    },
+  },
+});

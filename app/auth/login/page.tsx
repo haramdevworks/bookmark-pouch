@@ -20,9 +20,37 @@ export default function LoginPage() {
     };
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session) {
-        router.push("/");
+        try {
+          // 세션을 서버로 전달 (서버가 쿠키에 저장)
+          await fetch("/api/auth/set-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session }),
+          });
+
+          // 서버가 준비될 때까지 충분히 기다리기 (최대 3초)
+          let retries = 0;
+          const maxRetries = 30; // 3초 (100ms * 30)
+
+          while (retries < maxRetries) {
+            const verifyResponse = await fetch("/api/auth/verify");
+            if (verifyResponse.ok) {
+              console.log("[login] ✅ 서버 준비 완료");
+              router.push("/");
+              return;
+            }
+            retries++;
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+
+          console.warn("[login] 서버 준비 완료 안 됨, 리다이렉트");
+          router.push("/");
+        } catch (error) {
+          console.error("[login] 에러:", error);
+          router.push("/");
+        }
       }
     });
 
@@ -55,7 +83,7 @@ export default function LoginPage() {
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault();
-    
+
     if (!email || !password) {
       setError("이메일과 비밀번호를 입력해주세요.");
       return;
@@ -72,7 +100,24 @@ export default function LoginPage() {
 
       if (error) {
         setError(error.message);
+        return;
       }
+
+      console.log("[login] 1️⃣ signInWithPassword 성공");
+
+      // 클라이언트 session 동기화
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log("[login] 2️⃣ getUser 완료:", user?.email);
+
+      // 서버 컴포넌트 재렌더링 (쿠키 업데이트됨)
+      console.log("[login] 3️⃣ router.refresh() 호출");
+      router.refresh();
+
+      // 약간의 딜레이 후 리다이렉트
+      console.log("[login] 4️⃣ 딜레이 후 리다이렉트");
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      router.push("/");
     } catch (err) {
       setError("로그인에 실패했습니다.");
     } finally {

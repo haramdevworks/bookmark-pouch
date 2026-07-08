@@ -33,6 +33,7 @@ export function FolderList({ folders }: { folders: Folder[] }) {
 
     try {
       await updateFolderAction(folder.id, name);
+      // 폴더 이름 수정 후 목록 갱신
       router.refresh();
     } catch {
       window.alert("폴더 이름을 수정하지 못했습니다.");
@@ -45,6 +46,7 @@ export function FolderList({ folders }: { folders: Folder[] }) {
 
     try {
       await deleteFolderAction(folder.id);
+      // 폴더 삭제 후 목록 갱신
       router.refresh();
     } catch {
       window.alert("폴더를 삭제하지 못했습니다.");

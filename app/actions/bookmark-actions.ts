@@ -53,7 +53,7 @@ export async function createBookmarkAction(
   try {
     const userId = await getUserId();
     const bookmark = await createBookmark({ url, folderId }, userId);
-    if (tagId) await linkTagsToBookmark(bookmark.id, [tagId]);
+    if (tagId) await linkTagsToBookmark(bookmark.id, [tagId], userId);
     after(() => enrichBookmarkInBackground(bookmark.id, bookmark.url, userId));
   } catch (error) {
     return { error: error instanceof Error ? error.message : "링크를 저장하지 못했습니다." };

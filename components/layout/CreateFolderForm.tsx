@@ -1,20 +1,27 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { createFolderAction, type FolderActionState } from "@/app/actions/folder-actions";
 
 const initialState: FolderActionState = {};
 
 export function CreateFolderForm() {
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction, isPending] = useActionState(createFolderAction, initialState);
 
   useEffect(() => {
+    console.log("[CreateFolderForm] state:", state);
+
     if (!state.error) {
+      console.log("[CreateFolderForm] 성공, refresh 호출");
       formRef.current?.reset();
+      // 폴더 생성 후 목록 갱신
+      router.refresh();
     }
-  }, [state]);
+  }, [state, router]);
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-1 px-2 pt-1">
