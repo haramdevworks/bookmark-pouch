@@ -50,7 +50,7 @@ export function SearchBar({ defaultQuery = "" }: { defaultQuery?: string }) {
         type="text"
         name="q"
         defaultValue={defaultQuery}
-        placeholder="제목, 태그, 메모 검색"
+        placeholder="제목, 설명, URL, 태그, 메모 검색"
         className="w-full bg-transparent text-[13px] text-foreground placeholder:text-description outline-none"
       />
     </form>

@@ -112,9 +112,10 @@ create policy "Public access" on public.bookmark_tags
 -- ---------------------------------------------------------------------------
 -- 5차: 검색
 -- title/description/url/site_name/memo/content_type/summary는 일반 컬럼이라
--- PostgREST의 ilike 필터로 바로 검색할 수 있지만, quotes/ai_tags는 text[] 배열이라
--- 배열 원소 단위의 부분 일치 검색을 PostgREST 연산자만으로 표현할 수 없다.
--- 이를 위해 unnest + ilike로 배열까지 포함해 검색하는 함수를 하나 둔다.
+-- PostgREST의 ilike 필터로 바로 검색할 수 있지만, quotes/ai_tags는 text[] 배열이고,
+-- 실제 태그는 bookmark_tags 관계 테이블에 있어서 배열 원소 단위의 부분 일치 검색을
+-- PostgREST 연산자만으로 표현할 수 없다.
+-- 이를 위해 unnest + ilike로 배열과 관계 테이블까지 포함해 검색하는 함수를 하나 둔다.
 -- RLS는 함수를 SECURITY INVOKER(기본값)로 두어 호출자 권한 그대로 적용되게 한다.
 -- ---------------------------------------------------------------------------
 create or replace function public.search_bookmark_ids(search_term text)
@@ -122,8 +123,10 @@ returns table (id uuid)
 language sql
 stable
 as $$
-  select b.id
+  select distinct b.id
   from public.bookmarks b
+  left join public.bookmark_tags bt on b.id = bt.bookmark_id
+  left join public.tags t on bt.tag_id = t.id
   where
     b.title ilike '%' || search_term || '%'
     or b.description ilike '%' || search_term || '%'
@@ -133,7 +136,8 @@ as $$
     or b.content_type ilike '%' || search_term || '%'
     or b.summary ilike '%' || search_term || '%'
     or exists (select 1 from unnest(b.quotes) as quote where quote ilike '%' || search_term || '%')
-    or exists (select 1 from unnest(b.ai_tags) as tag where tag ilike '%' || search_term || '%');
+    or t.name ilike '%' || search_term || '%'
+    or exists (select 1 from unnest(b.ai_tags) as ai_tag where ai_tag ilike '%' || search_term || '%');
 $$;
 
 grant execute on function public.search_bookmark_ids(text) to anon, authenticated;
