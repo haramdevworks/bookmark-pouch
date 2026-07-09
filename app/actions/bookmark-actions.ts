@@ -28,6 +28,7 @@ async function enrichBookmarkInBackground(id: string, url: string, userId: strin
     ok: metadata.title ? 'has title' : 'no title',
     title: metadata.title,
     description: metadata.description?.substring(0, 50),
+    hasArticleText: !!articleText,
   });
 
   let bookmark;
@@ -44,6 +45,12 @@ async function enrichBookmarkInBackground(id: string, url: string, userId: strin
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
     });
+    return;
+  }
+
+  // 본문이 있는 경우에만 AI 분석 실행
+  if (!articleText) {
+    console.log(`[enrichBookmarkInBackground] Skipping AI analysis (no article text)`);
     return;
   }
 
