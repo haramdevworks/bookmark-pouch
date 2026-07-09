@@ -86,6 +86,13 @@ export function BookmarkDetailForm({ bookmark, folders }: { bookmark: Bookmark; 
         {formatDate(bookmark.createdAt)}
       </span>
 
+      {bookmark.description && (
+        <div className="flex flex-col gap-1.5 border-t border-border pt-4">
+          <p className="text-[11px] font-semibold text-description">설명</p>
+          <p className="whitespace-pre-wrap text-[13px] text-foreground/80">{bookmark.description}</p>
+        </div>
+      )}
+
       {bookmark.summary && (
         <div className="flex flex-col gap-1.5 border-t border-border pt-4">
           <p className="flex items-center gap-1.5 text-[11px] font-semibold text-description">
