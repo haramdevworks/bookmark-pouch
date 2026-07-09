@@ -104,6 +104,11 @@ export interface BookmarkListFilters {
   tagId?: string;
 }
 
+export interface BookmarkListResult {
+  data: Bookmark[];
+  total: number;
+}
+
 async function getBookmarkIdsByTag(tagId: string, userId: string): Promise<string[]> {
   const { data, error } = await (await getSupabaseClient())
     .from("bookmark_tags")
@@ -132,10 +137,17 @@ async function getBookmarkIdsByTag(tagId: string, userId: string): Promise<strin
   return (bookmarks ?? []).map((row) => row.id);
 }
 
-export async function getBookmarks(filters: BookmarkListFilters = {}, userId: string): Promise<Bookmark[]> {
+export async function getBookmarks(
+  filters: BookmarkListFilters = {},
+  userId: string,
+  page = 1,
+): Promise<BookmarkListResult> {
+  const ITEMS_PER_PAGE = 10;
+  const offset = (page - 1) * ITEMS_PER_PAGE;
+
   let queryBuilder = (await getSupabaseClient())
     .from("bookmarks")
-    .select(BOOKMARK_SELECT)
+    .select(BOOKMARK_SELECT, { count: "exact" })
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
@@ -149,27 +161,34 @@ export async function getBookmarks(filters: BookmarkListFilters = {}, userId: st
 
   if (filters.tagId) {
     const ids = await getBookmarkIdsByTag(filters.tagId, userId);
-    if (ids.length === 0) return [];
+    if (ids.length === 0) return { data: [], total: 0 };
     queryBuilder = queryBuilder.in("id", ids);
   }
 
-  const { data, error } = await queryBuilder;
+  const { data, error, count } = await queryBuilder.range(offset, offset + ITEMS_PER_PAGE - 1);
 
   if (error) {
     throw new Error("북마크 목록을 불러오지 못했습니다.");
   }
 
-  return (data as unknown as BookmarkRow[]).map(mapRow);
+  return {
+    data: (data as unknown as BookmarkRow[]).map(mapRow),
+    total: count ?? 0,
+  };
 }
 
 export async function searchBookmarks(
   query: string,
   filters: BookmarkListFilters = {},
   userId: string,
-): Promise<Bookmark[]> {
+  page = 1,
+): Promise<BookmarkListResult> {
+  const ITEMS_PER_PAGE = 10;
+  const offset = (page - 1) * ITEMS_PER_PAGE;
+
   const trimmed = query.trim();
   if (!trimmed) {
-    return getBookmarks(filters, userId);
+    return getBookmarks(filters, userId, page);
   }
 
   const { data: idRows, error: searchError } = await (await getSupabaseClient()).rpc("search_bookmark_ids", {
@@ -182,18 +201,18 @@ export async function searchBookmarks(
 
   let ids = ((idRows ?? []) as { id: string }[]).map((row) => row.id);
   if (ids.length === 0) {
-    return [];
+    return { data: [], total: 0 };
   }
 
   if (filters.tagId) {
     const tagBookmarkIds = new Set(await getBookmarkIdsByTag(filters.tagId, userId));
     ids = ids.filter((id) => tagBookmarkIds.has(id));
-    if (ids.length === 0) return [];
+    if (ids.length === 0) return { data: [], total: 0 };
   }
 
   let queryBuilder = (await getSupabaseClient())
     .from("bookmarks")
-    .select(BOOKMARK_SELECT)
+    .select(BOOKMARK_SELECT, { count: "exact" })
     .eq("user_id", userId)
     .in("id", ids)
     .order("created_at", { ascending: false });
@@ -206,13 +225,16 @@ export async function searchBookmarks(
     }
   }
 
-  const { data, error } = await queryBuilder;
+  const { data, error, count } = await queryBuilder.range(offset, offset + ITEMS_PER_PAGE - 1);
 
   if (error) {
     throw new Error("검색 결과를 불러오지 못했습니다.");
   }
 
-  return (data as unknown as BookmarkRow[]).map(mapRow);
+  return {
+    data: (data as unknown as BookmarkRow[]).map(mapRow),
+    total: count ?? 0,
+  };
 }
 
 export async function getBookmarkById(id: string, userId: string): Promise<Bookmark | null> {
