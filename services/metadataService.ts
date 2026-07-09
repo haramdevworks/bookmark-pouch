@@ -43,6 +43,7 @@ function emptyMetadata(contentType: string): FetchedMetadata {
  * 콘텐츠 유형은 페이지 접근 성공 여부와 무관하게 URL만으로 항상 계산된다.
  */
 export async function fetchUrlMetadata(rawUrl: string): Promise<FetchMetadataResult> {
+  console.log(`[fetchUrlMetadata] 시작: ${rawUrl}`);
   let url: URL;
   try {
     url = new URL(rawUrl.trim());
@@ -63,6 +64,7 @@ export async function fetchUrlMetadata(rawUrl: string): Promise<FetchMetadataRes
     });
 
     if (!response.ok) {
+      console.log(`[fetchUrlMetadata] Response not ok: ${response.status} for ${url.toString()}`);
       return { ok: false, metadata: emptyMetadata(contentType), articleText: null };
     }
 
@@ -70,12 +72,19 @@ export async function fetchUrlMetadata(rawUrl: string): Promise<FetchMetadataRes
     const parsed = parseHtmlMetadata(html, response.url || url.toString());
     const articleText = extractArticleText(html);
 
+    console.log(`[fetchUrlMetadata] Success for ${url.toString()}`, {
+      title: parsed.title,
+      description: parsed.description?.substring(0, 50),
+      hasArticleText: !!articleText,
+    });
+
     return {
       ok: true,
       metadata: { ...parsed, contentType },
       articleText,
     };
-  } catch {
+  } catch (error) {
+    console.log(`[fetchUrlMetadata] Error for ${url.toString()}:`, error instanceof Error ? error.message : error);
     return { ok: false, metadata: emptyMetadata(contentType), articleText: null };
   }
 }

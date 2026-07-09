@@ -20,15 +20,34 @@ function readFolderId(formData: FormData): string | null {
 }
 
 async function enrichBookmarkInBackground(id: string, url: string, userId: string): Promise<void> {
+  console.log(`[enrichBookmarkInBackground] Starting for ${url}, id: ${id}, userId: ${userId}`);
+
   const { metadata, articleText } = await fetchUrlMetadata(url);
+
+  console.log(`[enrichBookmarkInBackground] Fetched metadata:`, {
+    ok: metadata.title ? 'has title' : 'no title',
+    title: metadata.title,
+    description: metadata.description?.substring(0, 50),
+  });
 
   let bookmark;
   try {
+    console.log(`[enrichBookmarkInBackground] Calling applyFetchedMetadata with:`, {
+      id,
+      userId,
+      title: metadata.title,
+    });
     bookmark = await applyFetchedMetadata(id, userId, metadata);
-  } catch {
+    console.log(`[enrichBookmarkInBackground] Successfully applied metadata`);
+  } catch (error) {
+    console.error(`[enrichBookmarkInBackground] Failed to apply metadata:`, {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return;
   }
 
+  console.log(`[enrichBookmarkInBackground] Starting AI analysis...`);
   await analyzeAndSaveBookmark(
     {
       id: bookmark.id,
@@ -40,6 +59,7 @@ async function enrichBookmarkInBackground(id: string, url: string, userId: strin
     },
     userId
   );
+  console.log(`[enrichBookmarkInBackground] Completed`);
 }
 
 export async function createBookmarkAction(

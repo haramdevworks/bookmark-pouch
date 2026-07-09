@@ -296,6 +296,11 @@ export async function applyFetchedMetadata(id: string, userId: string, metadata:
   if (metadata.title) patch.title = metadata.title;
   if (metadata.description) patch.description = metadata.description;
 
+  console.log(`[applyFetchedMetadata] Updating bookmark ${id}:`, {
+    title: patch.title,
+    description: patch.description?.substring(0, 50),
+  });
+
   const { data, error } = await (await getSupabaseClient())
     .from("bookmarks")
     .update(patch)
@@ -305,9 +310,11 @@ export async function applyFetchedMetadata(id: string, userId: string, metadata:
     .single();
 
   if (error || !data) {
+    console.error(`[applyFetchedMetadata] Error updating bookmark ${id}:`, error);
     throw new Error("메타데이터를 저장하지 못했습니다.");
   }
 
+  console.log(`[applyFetchedMetadata] Successfully updated bookmark ${id}`);
   return mapRow(data as unknown as BookmarkRow);
 }
 
