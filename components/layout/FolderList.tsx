@@ -61,7 +61,7 @@ export function FolderList({ folders }: { folders: Folder[] }) {
           activeFolderId ? "text-foreground/80 hover:bg-accent" : "text-primary"
         }`}
       >
-        <FolderIcon className="size-3 shrink-0 fill-current stroke-none" />
+        <FolderIcon className="size-3 shrink-0 fill-none stroke-current" />
         전체
       </Link>
       <Link
@@ -73,6 +73,9 @@ export function FolderList({ folders }: { folders: Folder[] }) {
         <FolderIcon className="size-3 shrink-0 fill-none stroke-current" />
         미분류
       </Link>
+      {folders.length > 0 && (
+        <div className="my-1 h-px bg-border/30" />
+      )}
       {folders.map((folder) => (
         <div key={folder.id} className="group flex items-center rounded-lg hover:bg-accent">
           <Link
@@ -81,7 +84,7 @@ export function FolderList({ folders }: { folders: Folder[] }) {
               activeFolderId === folder.id ? "font-semibold text-primary" : "text-foreground/80"
             }`}
           >
-            <FolderIcon className="size-3 shrink-0 fill-current stroke-none" />
+            <FolderIcon className="size-3 shrink-0 fill-none stroke-current" />
             <span className="truncate">{folder.name}</span>
           </Link>
           <button

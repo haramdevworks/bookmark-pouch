@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Cloud as CloudIcon, Tag as TagIcon } from "lucide-react";
+import { Archive as ArchiveIcon, Tag as TagIcon } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -48,12 +48,13 @@ export async function Sidebar() {
         <AccordionItem value="folders" className="border-none">
           <AccordionTrigger className="px-2 py-2 text-[13px] font-semibold text-foreground hover:bg-accent hover:no-underline">
             <span className="flex items-center gap-2">
-              <CloudIcon className="size-3.5" />
+              <ArchiveIcon className="size-3.5 fill-none stroke-current" />
               폴더
             </span>
           </AccordionTrigger>
           <AccordionContent>
             <FolderListWithRefresh initialFolders={folders} />
+            <div className="my-1 h-px bg-border/30" />
             <CreateFolderForm />
           </AccordionContent>
         </AccordionItem>
@@ -61,7 +62,7 @@ export async function Sidebar() {
         <AccordionItem value="tags" className="border-none">
           <AccordionTrigger className="px-2 py-2 text-[13px] font-semibold text-foreground hover:bg-accent hover:no-underline">
             <span className="flex items-center gap-2">
-              <TagIcon className="size-3.5" />
+              <TagIcon className="size-3.5 fill-none stroke-current" />
               태그
             </span>
           </AccordionTrigger>

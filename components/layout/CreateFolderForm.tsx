@@ -20,7 +20,7 @@ export function CreateFolderForm() {
   }, [state, router]);
 
   return (
-    <form ref={formRef} action={formAction} className="flex flex-col gap-1 px-2 pt-1">
+    <form ref={formRef} action={formAction} className="flex flex-col gap-1 px-2 pt-2">
       <div className="flex items-center gap-1.5">
         <input
           name="name"
