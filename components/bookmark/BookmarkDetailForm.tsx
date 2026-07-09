@@ -93,7 +93,7 @@ export function BookmarkDetailForm({ bookmark, folders }: { bookmark: Bookmark; 
         </div>
       )}
 
-      {bookmark.summary && (
+      {bookmark.quotes.length > 0 && (
         <div className="flex flex-col gap-1.5 border-t border-border pt-4">
           <p className="flex items-center gap-1.5 text-[11px] font-semibold text-description">
             <Sparkles className="size-3.5 text-primary" />
@@ -101,21 +101,19 @@ export function BookmarkDetailForm({ bookmark, folders }: { bookmark: Bookmark; 
           </p>
           <p className="whitespace-pre-wrap text-[13px] text-foreground/80">{bookmark.summary}</p>
 
-          {bookmark.quotes.length > 0 && (
-            <div className="flex flex-col gap-1.5 border-t border-border pt-4">
-              <p className="text-[11px] font-semibold text-description">핵심 문장</p>
-              <ul className="flex flex-col gap-2">
-                {bookmark.quotes.map((quote, index) => (
-                  <li
-                    key={index}
-                    className="border-l-2 border-primary pl-3 text-[13px] italic text-foreground/80"
-                  >
-                    &ldquo;{quote}&rdquo;
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <div className="flex flex-col gap-1.5 border-t border-border pt-4">
+            <p className="text-[11px] font-semibold text-description">핵심 문장</p>
+            <ul className="flex flex-col gap-2">
+              {bookmark.quotes.map((quote, index) => (
+                <li
+                  key={index}
+                  className="border-l-2 border-primary pl-3 text-[13px] italic text-foreground/80"
+                >
+                  &ldquo;{quote}&rdquo;
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
 
