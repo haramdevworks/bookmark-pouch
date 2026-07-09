@@ -8,8 +8,6 @@ export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   useEffect(() => {
     const checkSession = async () => {
@@ -81,21 +79,14 @@ export default function LoginPage() {
     }
   }
 
-  async function handleEmailLogin(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (!email || !password) {
-      setError("이메일과 비밀번호를 입력해주세요.");
-      return;
-    }
-
+  async function handleDemoLogin() {
     try {
       setIsLoading(true);
       setError(null);
 
       const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+        email: "pouchuser@gmail.com",
+        password: "p20260710!",
       });
 
       if (error) {
@@ -103,20 +94,13 @@ export default function LoginPage() {
         return;
       }
 
-      console.log("[login] 1️⃣ signInWithPassword 성공");
+      console.log("[login] ✅ 체험 계정 로그인 성공");
 
-      // 클라이언트 session 동기화
       const { data: { user } } = await supabase.auth.getUser();
-      console.log("[login] 2️⃣ getUser 완료:", user?.email);
+      console.log("[login] 사용자:", user?.email);
 
-      // 서버 컴포넌트 재렌더링 (쿠키 업데이트됨)
-      console.log("[login] 3️⃣ router.refresh() 호출");
       router.refresh();
-
-      // 약간의 딜레이 후 리다이렉트
-      console.log("[login] 4️⃣ 딜레이 후 리다이렉트");
       await new Promise(resolve => setTimeout(resolve, 500));
-
       router.push("/");
     } catch (err) {
       setError("로그인에 실패했습니다.");
@@ -142,32 +126,14 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* 이메일/비밀번호 로그인 */}
-        <form onSubmit={handleEmailLogin} className="mb-4 flex flex-col gap-3">
-          <input
-            type="email"
-            placeholder="이메일"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={isLoading}
-            className="h-9 rounded-lg border border-border bg-background px-3 text-[13px] outline-none focus:border-primary disabled:opacity-60"
-          />
-          <input
-            type="password"
-            placeholder="비밀번호"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
-            className="h-9 rounded-lg border border-border bg-background px-3 text-[13px] outline-none focus:border-primary disabled:opacity-60"
-          />
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="h-9 rounded-lg bg-primary text-[13px] font-semibold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
-          >
-            {isLoading ? "로그인 중..." : "로그인"}
-          </button>
-        </form>
+        {/* 체험하기 버튼 */}
+        <button
+          onClick={handleDemoLogin}
+          disabled={isLoading}
+          className="w-full mb-4 h-9 rounded-lg bg-primary text-[13px] font-semibold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
+        >
+          {isLoading ? "로그인 중..." : "체험하기"}
+        </button>
 
         <div className="relative mb-4">
           <div className="absolute inset-0 flex items-center">
