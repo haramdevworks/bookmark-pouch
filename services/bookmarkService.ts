@@ -140,7 +140,11 @@ export async function getBookmarks(filters: BookmarkListFilters = {}, userId: st
     .order("created_at", { ascending: false });
 
   if (filters.folderId) {
-    queryBuilder = queryBuilder.eq("folder_id", filters.folderId);
+    if (filters.folderId === "unclassified") {
+      queryBuilder = queryBuilder.is("folder_id", null);
+    } else {
+      queryBuilder = queryBuilder.eq("folder_id", filters.folderId);
+    }
   }
 
   if (filters.tagId) {
@@ -195,7 +199,11 @@ export async function searchBookmarks(
     .order("created_at", { ascending: false });
 
   if (filters.folderId) {
-    queryBuilder = queryBuilder.eq("folder_id", filters.folderId);
+    if (filters.folderId === "unclassified") {
+      queryBuilder = queryBuilder.is("folder_id", null);
+    } else {
+      queryBuilder = queryBuilder.eq("folder_id", filters.folderId);
+    }
   }
 
   const { data, error } = await queryBuilder;

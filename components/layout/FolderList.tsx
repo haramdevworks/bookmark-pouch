@@ -64,6 +64,15 @@ export function FolderList({ folders }: { folders: Folder[] }) {
         <FolderIcon className="size-3 shrink-0 fill-current stroke-none" />
         전체
       </Link>
+      <Link
+        href={hrefFor("unclassified")}
+        className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] font-semibold transition-colors ${
+          activeFolderId === "unclassified" ? "text-primary" : "text-foreground/80 hover:bg-accent"
+        }`}
+      >
+        <FolderIcon className="size-3 shrink-0 fill-none stroke-current" />
+        미분류
+      </Link>
       {folders.map((folder) => (
         <div key={folder.id} className="group flex items-center rounded-lg hover:bg-accent">
           <Link
