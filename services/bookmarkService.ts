@@ -111,7 +111,7 @@ async function getBookmarkIdsByTag(tagId: string, userId: string): Promise<strin
     throw new Error("태그로 필터링하지 못했습니다.");
   }
 
-  return (bookmarks ?? []).map((row) => row.id);
+  return ((bookmarks ?? []) as { id: string }[]).map((row) => row.id);
 }
 
 export async function getBookmarks(
