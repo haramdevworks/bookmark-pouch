@@ -4,6 +4,8 @@ import { getFolders } from "@/services/folderService";
 import { getUserId } from "@/lib/auth";
 import { BookmarkDetailForm } from "@/components/bookmark/BookmarkDetailForm";
 
+export const revalidate = 60;
+
 export default async function BookmarkDetailPage({
   params,
 }: {
