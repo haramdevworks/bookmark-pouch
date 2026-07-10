@@ -1,5 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { getSupabaseServerClient } from "@/lib/supabaseServerClient";
 import type { Tag } from "@/types";
 
 const TAG_SELECT = "id, name, created_at";
@@ -14,32 +13,8 @@ function mapRow(row: TagRow): Tag {
   return { id: row.id, name: row.name, createdAt: row.created_at };
 }
 
-async function getSupabaseClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Handle errors silently
-          }
-        },
-      },
-    }
-  );
-}
-
 export async function getTags(userId: string): Promise<Tag[]> {
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase
     .from("tags")
     .select(TAG_SELECT)
@@ -54,7 +29,7 @@ export async function getTags(userId: string): Promise<Tag[]> {
 }
 
 export async function getTagsByBookmarkId(bookmarkId: string, userId: string): Promise<Tag[]> {
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase
     .from("bookmark_tags")
     .select("tags ( id, name, created_at )")
@@ -90,7 +65,7 @@ export async function createTag(name: string, userId: string): Promise<Tag> {
     throw new Error("태그 이름을 입력해주세요.");
   }
 
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase
     .from("tags")
     .upsert({ name: trimmed, user_id: userId }, { onConflict: "user_id,name" })
@@ -107,7 +82,7 @@ export async function createTag(name: string, userId: string): Promise<Tag> {
 export async function linkTagsToBookmark(bookmarkId: string, tagIds: string[], userId: string): Promise<void> {
   if (tagIds.length === 0) return;
 
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   console.log("[linkTagsToBookmark] 시작:", { bookmarkId, tagIds, userId });
 
   // onConflict 없이 단순 insert 시도 (delete후 insert)
@@ -139,7 +114,7 @@ export async function linkTagsToBookmark(bookmarkId: string, tagIds: string[], u
 }
 
 export async function unlinkTagFromBookmark(bookmarkId: string, tagId: string): Promise<void> {
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   const { error } = await supabase
     .from("bookmark_tags")
     .delete()
@@ -157,7 +132,7 @@ export async function updateTag(id: string, name: string, userId: string): Promi
     throw new Error("태그 이름을 입력해주세요.");
   }
 
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase
     .from("tags")
     .update({ name: trimmed })
@@ -174,7 +149,7 @@ export async function updateTag(id: string, name: string, userId: string): Promi
 }
 
 export async function deleteTag(id: string, userId: string): Promise<void> {
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   const { error } = await supabase.from("tags").delete().eq("id", id).eq("user_id", userId);
 
   if (error) {

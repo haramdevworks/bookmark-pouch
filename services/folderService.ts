@@ -1,5 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { getSupabaseServerClient } from "@/lib/supabaseServerClient";
 import type { CreateFolderInput, Folder } from "@/types";
 
 const FOLDER_SELECT = "id, name, created_at";
@@ -14,32 +13,8 @@ function mapRow(row: FolderRow): Folder {
   return { id: row.id, name: row.name, createdAt: row.created_at };
 }
 
-async function getSupabaseClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Handle errors silently
-          }
-        },
-      },
-    }
-  );
-}
-
 export async function getFolders(userId: string): Promise<Folder[]> {
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase
     .from("folders")
     .select(FOLDER_SELECT)
@@ -54,7 +29,7 @@ export async function getFolders(userId: string): Promise<Folder[]> {
 }
 
 export async function getFolderById(id: string, userId: string): Promise<Folder | null> {
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase
     .from("folders")
     .select(FOLDER_SELECT)
@@ -75,7 +50,7 @@ export async function createFolder(input: CreateFolderInput, userId: string): Pr
     throw new Error("폴더 이름을 입력해주세요.");
   }
 
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase
     .from("folders")
     .insert({ name, user_id: userId })
@@ -95,7 +70,7 @@ export async function updateFolder(id: string, name: string, userId: string): Pr
     throw new Error("폴더 이름을 입력해주세요.");
   }
 
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase
     .from("folders")
     .update({ name: trimmed })
@@ -112,7 +87,7 @@ export async function updateFolder(id: string, name: string, userId: string): Pr
 }
 
 export async function deleteFolder(id: string, userId: string): Promise<void> {
-  const supabase = await getSupabaseClient();
+  const supabase = await getSupabaseServerClient();
   const { error } = await supabase.from("folders").delete().eq("id", id).eq("user_id", userId);
 
   if (error) {

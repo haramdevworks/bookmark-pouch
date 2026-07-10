@@ -1,31 +1,6 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { getSupabaseServerClient } from "@/lib/supabaseServerClient";
 import type { Bookmark, CreateBookmarkInput, Tag, UpdateBookmarkInput } from "@/types";
 import type { FetchedMetadata } from "./metadataService";
-
-async function getSupabaseClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Handle errors silently
-          }
-        },
-      },
-    }
-  );
-}
 
 
 const DEFAULT_TITLE = "제목 없음";
@@ -110,7 +85,8 @@ export interface BookmarkListResult {
 }
 
 async function getBookmarkIdsByTag(tagId: string, userId: string): Promise<string[]> {
-  const { data, error } = await (await getSupabaseClient())
+  const supabase = await getSupabaseServerClient();
+  const { data, error } = await supabase
     .from("bookmark_tags")
     .select("bookmark_id")
     .eq("tag_id", tagId);
@@ -124,7 +100,8 @@ async function getBookmarkIdsByTag(tagId: string, userId: string): Promise<strin
   // 사용자의 북마크만 필터링
   if (bookmarkIds.length === 0) return [];
 
-  const { data: bookmarks, error: filterError } = await (await getSupabaseClient())
+  const supabase2 = await getSupabaseServerClient();
+  const { data: bookmarks, error: filterError } = await supabase2
     .from("bookmarks")
     .select("id")
     .in("id", bookmarkIds)
@@ -145,7 +122,8 @@ export async function getBookmarks(
   const ITEMS_PER_PAGE = 10;
   const offset = (page - 1) * ITEMS_PER_PAGE;
 
-  let queryBuilder = (await getSupabaseClient())
+  const supabase = await getSupabaseServerClient();
+  let queryBuilder = supabase
     .from("bookmarks")
     .select(BOOKMARK_SELECT, { count: "exact" })
     .eq("user_id", userId)
@@ -191,7 +169,8 @@ export async function searchBookmarks(
     return getBookmarks(filters, userId, page);
   }
 
-  const { data: idRows, error: searchError } = await (await getSupabaseClient()).rpc("search_bookmark_ids", {
+  const supabase = await getSupabaseServerClient();
+  const { data: idRows, error: searchError } = await supabase.rpc("search_bookmark_ids", {
     search_term: trimmed,
   });
 
@@ -210,7 +189,7 @@ export async function searchBookmarks(
     if (ids.length === 0) return { data: [], total: 0 };
   }
 
-  let queryBuilder = (await getSupabaseClient())
+  let queryBuilder = supabase
     .from("bookmarks")
     .select(BOOKMARK_SELECT, { count: "exact" })
     .eq("user_id", userId)
@@ -238,7 +217,8 @@ export async function searchBookmarks(
 }
 
 export async function getBookmarkById(id: string, userId: string): Promise<Bookmark | null> {
-  const { data, error } = await (await getSupabaseClient())
+  const supabase = await getSupabaseServerClient();
+  const { data, error } = await supabase
     .from("bookmarks")
     .select(BOOKMARK_SELECT)
     .eq("id", id)
@@ -254,8 +234,9 @@ export async function getBookmarkById(id: string, userId: string): Promise<Bookm
 
 export async function createBookmark(input: CreateBookmarkInput, userId: string): Promise<Bookmark> {
   const url = assertValidUrl(input.url);
+  const supabase = await getSupabaseServerClient();
 
-  const { data, error } = await (await getSupabaseClient())
+  const { data, error } = await supabase
     .from("bookmarks")
     .insert({
       url,
@@ -281,7 +262,8 @@ export async function updateBookmark(id: string, input: UpdateBookmarkInput, use
   if (input.memo !== undefined) patch.memo = input.memo?.trim() || null;
   if (input.folderId !== undefined) patch.folder_id = input.folderId;
 
-  const { data, error } = await (await getSupabaseClient())
+  const supabase = await getSupabaseServerClient();
+  const { data, error } = await supabase
     .from("bookmarks")
     .update(patch)
     .eq("id", id)
@@ -300,7 +282,8 @@ export async function updateBookmark(id: string, input: UpdateBookmarkInput, use
 }
 
 export async function deleteBookmark(id: string, userId: string): Promise<void> {
-  const { error } = await (await getSupabaseClient()).from("bookmarks").delete().eq("id", id).eq("user_id", userId);
+  const supabase = await getSupabaseServerClient();
+  const { error } = await supabase.from("bookmarks").delete().eq("id", id).eq("user_id", userId);
 
   if (error) {
     throw new Error("링크를 삭제하지 못했습니다.");
@@ -323,7 +306,8 @@ export async function applyFetchedMetadata(id: string, userId: string, metadata:
     description: patch.description?.substring(0, 50),
   });
 
-  const { data, error } = await (await getSupabaseClient())
+  const supabase = await getSupabaseServerClient();
+  const { data, error } = await supabase
     .from("bookmarks")
     .update(patch)
     .eq("id", id)
@@ -345,7 +329,8 @@ export async function updateBookmarkAiInsights(
   userId: string,
   insights: { summary: string; quotes: string[]; aiTags: string[] },
 ): Promise<void> {
-  const { error } = await (await getSupabaseClient())
+  const supabase = await getSupabaseServerClient();
+  const { error } = await supabase
     .from("bookmarks")
     .update({
       summary: insights.summary,
