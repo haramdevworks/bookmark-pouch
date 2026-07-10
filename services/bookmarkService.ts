@@ -95,7 +95,7 @@ async function getBookmarkIdsByTag(tagId: string, userId: string): Promise<strin
     throw new Error("태그로 필터링하지 못했습니다.");
   }
 
-  const bookmarkIds = (data ?? []).map((row) => row.bookmark_id as string);
+  const bookmarkIds = ((data ?? []) as { bookmark_id: string }[]).map((row) => row.bookmark_id);
 
   // 사용자의 북마크만 필터링
   if (bookmarkIds.length === 0) return [];
