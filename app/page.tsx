@@ -8,7 +8,6 @@ import { AutoRefresh } from "@/components/bookmark/AutoRefresh";
 import { EmptyState } from "@/components/common/EmptyState";
 import { SearchBar } from "@/components/common/SearchBar";
 
-export const revalidate = 30;
 
 export default async function HomePage({
   searchParams,

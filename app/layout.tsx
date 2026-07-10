@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: "리서치 자료 링크를 저장하고 다시 찾기 쉽게 관리하는 북마크 서비스",
 };
 
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({
   children,
 }: Readonly<{
